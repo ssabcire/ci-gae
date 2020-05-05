@@ -2,22 +2,43 @@ version: 2.1
 orbs:
   gcp-cli: circleci/gcp-cli@1.8.4
 
-jobs:
-  build:
-    docker:
-      - image: google/cloud-sdk:latest
-
+commands:
+  go_test:
+    description: test go file
     steps:
       - checkout
-      - gcp-cli/install
-      - gcp-cli/initialize # stepsで使うにはgcp-cli./initializeが必要
       - run:
-          name: Deploy Go Web Server to GAE
-          command: |
-            gcloud --quiet app deploy app.yaml
+        command: |
+          go test -v
+  # gae-deploy:
+  #   description: Deploy Go Web Server to GAE
+  #   steps:
+  #     - checkout
+  #     - gcp-cli/install
+  #     - gcp-cli/initialize
+  #     - run:
+  #         command: |
+  #           gcloud --quiet app deploy app.yaml
+
+jobs:
+  test:
+    docker:
+      - image: circleci/golang:1.12
+    steps:
+      - checkout
+      - go_test
+  # deploy:
+  #   docker:
+  #     - image: google/cloud-sdk:latest
+  #     - gae-deploy
 
 workflows:
   version: 2
-  deploy:
+  build:
     jobs:
-      - build
+      - test
+  # deploy:
+  #   jobs:
+  #     - deploy:
+  #       requires:
+  #         - build
