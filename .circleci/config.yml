@@ -9,6 +9,7 @@ jobs:
 
     steps:
       - checkout
+      - gcp-cli/install
       - gcp-cli/initialize # stepsで使うにはgcp-cli./initializeが必要
       - run:
           name: Deploy Go Web Server to GAE
