@@ -14,3 +14,9 @@ jobs:
           name: Deploy Go Web Server to GAE
           command: |
             gcloud --quiet app deploy app.yaml
+
+workflows:
+  version: 2
+  deploy:
+    jobs:
+      - build
