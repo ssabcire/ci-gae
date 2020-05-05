@@ -2,26 +2,43 @@ version: 2.1
 orbs:
   gcp-cli: circleci/gcp-cli@1.8.4
 
-jobs:
-  test:
-    docker:
-      - image: circleci/golang:1.12
+commands:
+  go_test:
+    description: "go test"
     steps:
       - checkout
       - run:
           command: |
             go test -v
 
-  deploy:
-    docker:
-      - image: google/cloud-sdk:latest
+  deploy_gae:
     steps:
-      - checkout
       - gcp-cli/install
       - gcp-cli/initialize
+      - checkout
       - run:
           command: |
             gcloud --quiet app deploy app.yaml
+
+executors:
+  go:
+    docker:
+      - image: circleci/golang:1.12
+
+  cloud-sdk:
+    docker:
+      - image: google/cloud-sdk:latest
+
+jobs:
+  test:
+    executor: go
+    steps:
+      - go_test
+
+  deploy:
+    executor: cloud-sdk
+    steps:
+      - deploy_gae
 
 workflows:
   version: 2
